@@ -4,9 +4,13 @@ const morgan = require('morgan')
 const dotenv = require('dotenv')
 dotenv.config();
 const app = express()
+
+const routers = require('./routers');
+
 app.use(cors())
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms'));
 app.use(express.json());
+app.use(routers);
 
 app.get('/ping', function(req, res){
     res.json({message: 'pong'})
