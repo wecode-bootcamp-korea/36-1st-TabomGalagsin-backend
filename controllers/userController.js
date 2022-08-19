@@ -1,19 +1,18 @@
 const userService = require('../services/userService');
 
-const signup = async (req, res) => {
+const signUp = async (req, res) => {
     try {
-        const beforepassword = req.body.password
-        const {first_name, last_name, nick_name, email, address} = req.body
-        if(!first_name || !last_name || !nick_name || !email|| !address|| !beforepassword){
+        const beforePassword = req.body.password
+        const {firstName, lastName, nickName, email, address} = req.body
+        if(!firstName || !lastName || !nickName || !email|| !address|| !beforePassword){
             const err = new Error('KEY_ERROR')
             err.statusCode = 400
             throw err
         }
-        await userService.signup(first_name, last_name, nick_name, email, address, beforepassword);
+        await userService.signUp(firstName, lastName, nickName, email, address, beforePassword);
         res.status(201).json({message: "userCreated"})
     }
     catch (err) {
-        console.log(err)
         res.status(err.statusCode || 500).json({message : err.message})
     }
 };
@@ -21,21 +20,20 @@ const signup = async (req, res) => {
 const login = async (req, res) => {
     try {
         const email = req.body.email
-        const checkpassword = req.body.password
-        if(!checkpassword){
+        const checkPassword = req.body.password
+        if(!checkPassword){
             const err = new Error('KEY_ERROR')
             err.statusCode = 400
             throw err
         }
-        const token = await userService.login(email, checkpassword);
+        const token = await userService.login(email, checkPassword);
         res.status(201).json({"accessToken" : token})
     }
     catch (err) {
-        console.log(err)
         res.status(err.statusCode || 500).json({message : err.message})
     }
 };
 
 module.exports = {
-	signup, login
+	signUp, login
 }
