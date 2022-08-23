@@ -1,6 +1,6 @@
 const { database } = require('../models/database');
 
-const getProductInfo = async (productId) => {
+const getProductInfoByproductId = async (productId) => {
     try {
         return await database.query(`
         SELECT 
@@ -68,5 +68,5 @@ const getProductInfo = async (productId) => {
 }
 
 module.exports = {
-    getProductInfo
+    getProductInfoByproductId
 }

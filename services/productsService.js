@@ -1,7 +1,7 @@
 const productsDao = require('../models/productsDao');
 
-const searchProduct = async (productId) => {
-    const productInfos = await productsDao.getProductInfo(productId)
+const getProductDetailByproductId = async (productId) => {
+    const productInfos = await productsDao.getProductInfoByproductId(productId)
     for (const productInfo of productInfos) {
         productInfo.color = JSON.parse(productInfo.color);
         productInfo.size = JSON.parse(productInfo.size);
@@ -11,5 +11,5 @@ const searchProduct = async (productId) => {
 }
 
 module.exports = {
-    searchProduct
+    getProductDetailByproductId
 }
