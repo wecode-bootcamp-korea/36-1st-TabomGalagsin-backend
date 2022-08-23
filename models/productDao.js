@@ -38,10 +38,9 @@ const getProductInfoByproductId = async (productId) => {
         ) AS size,
         (SELECT
             JSON_ARRAYAGG(JSON_OBJECT(
-                'colorId', stock.colorId,
-                'colorName', stock.colorName,
+                'sizeId', stock.sizeId,
                 'size', stock.size,
-                'stock', stock.stock)) JSONstock
+                'stock', stock.stock))JSONstock
                 FROM (SELECT DISTINCT 
                         color.id colorId,
                         color.color_name colorName,
