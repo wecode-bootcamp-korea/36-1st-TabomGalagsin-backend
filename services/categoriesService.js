@@ -9,8 +9,8 @@ const convertJson = (datas) => {
     return datas
 }
 
-const searchByType = async (categoryName) => {
-    const productInfos = await categoriesDao.getProductByType(categoryName);
+const searchByType = async (typeId) => {
+    const productInfos = await categoriesDao.getProductByType(typeId);
     return await convertJson(productInfos);
 }
 
