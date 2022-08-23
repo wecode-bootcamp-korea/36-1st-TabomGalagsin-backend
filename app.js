@@ -5,10 +5,12 @@ const dotenv = require('dotenv')
 dotenv.config();
 const routes = require('./routes')
 const app = express()
+
 app.use(cors())
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms'));
 app.use(express.json());
 app.use(routes)
+
 
 app.get('/ping', function(req, res){
     res.json({message: 'pong'})
