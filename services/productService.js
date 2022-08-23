@@ -1,4 +1,4 @@
-const productsDao = require('../models/productsDao');
+const productsDao = require('../models/productDao');
 
 const getProductDetailByproductId = async (productId) => {
     const productInfos = await productsDao.getProductInfoByproductId(productId)
