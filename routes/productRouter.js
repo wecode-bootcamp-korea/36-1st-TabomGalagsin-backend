@@ -10,7 +10,9 @@ router.get('/recommend/list', validateToken, productController.recommendLookUp)
 
 router.get('/random/list', productController.randomLookUp)
 
-router.get('/:productId/color/:colorId', productController.productColor)
+router.get('/color/:colorId/product/:productId', productController.productColor)
+
+router.get('/:productId', productController.getProductDetail);
 
 module.exports = {
 	router
