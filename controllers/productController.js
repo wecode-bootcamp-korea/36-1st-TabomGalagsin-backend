@@ -35,7 +35,7 @@ const productColor = async (req, res) => {
     try {
         const productId = req.params.productId
         const colorId = req.params.colorId
-        const productColorUrl = await productService.productColor(productId, colorId);
+        const productColorUrl = await productService.productColorLookUp(productId, colorId);
         res.status(200).json({productColorUrl : productColorUrl})
     }
     catch (err) {

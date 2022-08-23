@@ -11,7 +11,7 @@ const LookUpNew = async () => {
 
 const lookUpRecommend = async (decoded) => {
     const userId = await Object.values(decoded)[0]
-    const sql = await productDao.colorId(userId)
+    const sql = await productDao.checkColorId(userId)
     const colorId = Object.values(sql[sql.length-1])[0] 
     const lookUpMain = await productDao.lookUpRecommend(colorId)
     for(let type of lookUpMain){
@@ -30,11 +30,11 @@ const randomLookUp = async () => {
     return lookUpMain;
 };
 
-const productColor = async (productId, colorId) => {
+const productColorLookUp = async (productId, colorId) => {
     const productColorUrl = await productDao.productColorUrl(productId, colorId)
     return productColorUrl;
 };
 
 module.exports = {
-    productColor, LookUpNew, lookUpRecommend, randomLookUp
+    productColorLookUp, LookUpNew, lookUpRecommend, randomLookUp
 }

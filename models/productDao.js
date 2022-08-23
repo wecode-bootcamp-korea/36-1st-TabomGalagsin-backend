@@ -109,7 +109,7 @@ const randomLookUp = () => {
     )
 }
 
-const colorId = (userId) => {
+const checkColorId = (userId) => {
     return database.query(`
         SELECT 
             products_option.color_id
@@ -121,5 +121,5 @@ const colorId = (userId) => {
 }
 
 module.exports = {
-    productColorUrl, lookUpNew, lookUpRecommend, randomLookUp, colorId
+    productColorUrl, lookUpNew, lookUpRecommend, randomLookUp, checkColorId
 }
