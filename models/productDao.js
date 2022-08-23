@@ -109,13 +109,14 @@ const randomLookUp = () => {
     )
 }
 
-const colorId = (userEmail) => {
+const colorId = (userId) => {
     return database.query(`
         SELECT 
-            color_table_id 
-        from recommend
-        INNER JOIN users ON recommend.user_id = users.id
-        WHERE users.email = ?`, [userEmail]
+            products_option.color_id
+        from users
+        INNER JOIN recommend ON recommend.user_id = users.id
+        INNER JOIN products_option ON products_option.id = recommend.products_option_id
+        WHERE users.id = ?`, [userId]
     )
 }
 

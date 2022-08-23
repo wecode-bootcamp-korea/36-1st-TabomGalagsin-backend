@@ -10,8 +10,8 @@ const LookUpNew = async () => {
 };
 
 const lookUpRecommend = async (decoded) => {
-    const userEmail = await Object.values(decoded)[0]
-    const sql = await productDao.colorId(userEmail)
+    const userId = await Object.values(decoded)[0]
+    const sql = await productDao.colorId(userId)
     const colorId = Object.values(sql[sql.length-1])[0] 
     const lookUpMain = await productDao.lookUpRecommend(colorId)
     for(let type of lookUpMain){
