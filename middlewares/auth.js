@@ -4,6 +4,7 @@ const validateToken = async (req, res, next) => {
 	try {
 		const token = await req.headers.authorization;
         const decoded = await jwt.verify(token, process.env.SECRETKEY);
+		req.body.decoded = decoded
         if(decoded){
             next(); 
         }

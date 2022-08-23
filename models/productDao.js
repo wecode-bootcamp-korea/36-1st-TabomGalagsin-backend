@@ -41,7 +41,7 @@ const productColorUrl = (productId, colorId) => {
             color_name AS colorName
         FROM product_image
         INNER JOIN color ON color_id = color.id
-        WHERE product_id = ${productId} AND color_id = ${colorId}`
+        WHERE product_id = ? AND color_id = ?`, [productId, colorId]
     )
 };
 
@@ -71,13 +71,13 @@ const lookUpRecommend = async (colorId) => {
                 WHERE products.id = p.id) s ) AS size
         FROM products p
         LEFT JOIN product_image ON p.id = product_image.product_id
-        WHERE product_image.color_id = ${colorId}
+        WHERE product_image.color_id = ?
         GROUP BY p.id, product_image.image_url
-        ORDER BY RAND() LIMIT 4`   
+        ORDER BY RAND() LIMIT 4`, [colorId]   
     )
 }
 
-const notlookUpRecommend = () => {
+const randomLookUp = () => {
     return database.query(`
         SELECT  
             p.id AS productId,
@@ -115,10 +115,10 @@ const colorId = (userEmail) => {
             color_table_id 
         from recommend
         INNER JOIN users ON recommend.user_id = users.id
-        WHERE users.email = '${userEmail}'`
+        WHERE users.email = ?`, [userEmail]
     )
 }
 
 module.exports = {
-    productColorUrl, lookUpNew, lookUpRecommend, notlookUpRecommend, colorId
+    productColorUrl, lookUpNew, lookUpRecommend, randomLookUp, colorId
 }

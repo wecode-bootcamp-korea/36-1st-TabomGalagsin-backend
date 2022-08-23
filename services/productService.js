@@ -1,35 +1,33 @@
 const productDao = require('../models/productDao')
-const jwt = require('jsonwebtoken');
 
 const LookUpNew = async () => {
-    const lookUppMain = await productDao.lookUpNew()
-    for(let type of lookUppMain){
+    const lookUpMain = await productDao.lookUpNew()
+    for(let type of lookUpMain){
         type.color = JSON.parse(type.color)
         type.size = JSON.parse(type.size)
     }
-    return lookUppMain;
+    return lookUpMain;
 };
 
-const lookUpRecommend = async (token) => {
-    const decoded = await jwt.verify(token, process.env.SECRETKEY);
+const lookUpRecommend = async (decoded) => {
     const userEmail = await Object.values(decoded)[0]
     const sql = await productDao.colorId(userEmail)
     const colorId = Object.values(sql[sql.length-1])[0] 
-    const lookUppMain = await productDao.lookUpRecommend(colorId)
-    for(let type of lookUppMain){
+    const lookUpMain = await productDao.lookUpRecommend(colorId)
+    for(let type of lookUpMain){
         type.color = JSON.parse(type.color)
         type.size = JSON.parse(type.size)
     }
-    return lookUppMain;
+    return lookUpMain;
 };
 
-const notlookUpRecommend = async () => {
-    const lookUppMain = await productDao.notlookUpRecommend()
-    for(let type of lookUppMain){
+const randomLookUp = async () => {
+    const lookUpMain = await productDao.randomLookUp()
+    for(let type of lookUpMain){
         type.color = JSON.parse(type.color)
         type.size = JSON.parse(type.size)
     }
-    return lookUppMain;
+    return lookUpMain;
 };
 
 const productColor = async (productId, colorId) => {
@@ -38,5 +36,5 @@ const productColor = async (productId, colorId) => {
 };
 
 module.exports = {
-    productColor, LookUpNew, lookUpRecommend, notlookUpRecommend
+    productColor, LookUpNew, lookUpRecommend, randomLookUp
 }

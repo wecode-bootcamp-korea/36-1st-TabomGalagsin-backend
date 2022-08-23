@@ -12,15 +12,19 @@ const newLookUp = async (req, res) => {
 
 const recommendLookUp = async (req, res) => {
     try {
-        const token = await req.headers.authorization;
-        if(token){
-            const recommendProduct = await productService.lookUpRecommend(token);
-            res.status(200).json({recommendProduct : recommendProduct})
-        }
-        else {
-            const notrecommendProduct = await productService.notlookUpRecommend();
-            res.status(200).json({notrecommendProduct : notrecommendProduct})
-        }
+        const decoded = await req.body.decoded;
+        const recommendProduct = await productService.lookUpRecommend(decoded);
+        res.status(200).json({recommendProduct : recommendProduct})
+    }
+    catch (err) {
+        res.status(err.statusCode || 500).json({message : err.message})
+    }
+};
+
+const randomLookUp = async (req, res) => {
+    try {
+        const randomProduct = await productService.randomLookUp();
+        res.status(200).json({randomProduct : randomProduct})
     }
     catch (err) {
         res.status(err.statusCode || 500).json({message : err.message})
@@ -40,5 +44,5 @@ const productColor = async (req, res) => {
 };
 
 module.exports = {
-    productColor, newLookUp, recommendLookUp
+    productColor, newLookUp, recommendLookUp, randomLookUp
 }

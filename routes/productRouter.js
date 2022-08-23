@@ -1,13 +1,16 @@
 const express = require('express');
 const productController = require('../controllers/productController');
+const { validateToken } = require('../middlewares/auth.js');
 
 const router = express.Router();
 
-router.get('/new', productController.newLookUp)
+router.get('/new/list', productController.newLookUp)
 
-router.get('/recommend', productController.recommendLookUp)
+router.get('/recommend/list', validateToken, productController.recommendLookUp)
 
-router.get('/imageUrl/product/:productId/color/:colorId', productController.productColor)
+router.get('/random/list', productController.randomLookUp)
+
+router.get('/:productId/color/:colorId', productController.productColor)
 
 module.exports = {
 	router
