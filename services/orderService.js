@@ -12,8 +12,8 @@ const orderPayment = async (totalPrice, decoded) => {
     const userOptionId = [];
     const quantityOptionId = [];
     for(let pDetail of productDetail){
-        userOptionId.push([userId, pDetail.product_option_id])
-        quantityOptionId.push([pDetail.quantity, pDetail.product_option_id])
+        userOptionId.push([userId, pDetail.products_option_id])
+        quantityOptionId.push([pDetail.quantity, pDetail.products_option_id])
     }
     await orderDao.updateOrderStatus(userId)
     const pointCheck = await orderDao.getPoint(userId)
