@@ -1,7 +1,7 @@
 const { database } = require('./database');
-const { orderStatus } = require('../util/enum');
+const { orderStatus } = require('./orderStatusEnum');
 
-const paymentStatusAdd = (userId) => {
+const orderStatusAdd = (userId) => {
     try {
         return database.query(`
             UPDATE orders AS A INNER JOIN order_items AS B ON A.id = B.order_id  
@@ -35,7 +35,7 @@ const pointCheck = async (userId) => {
     )
 }
 
-const paymentPointCalculate = (userId, totalPrice) => {
+const orderPointCalculate = (userId, totalPrice) => {
     try {
         return database.query(`
             UPDATE users 
@@ -48,7 +48,7 @@ const paymentPointCalculate = (userId, totalPrice) => {
     }
 };
 
-const paymentRecommendAdd = (userOptionId) => {
+const orderRecommendAdd = (userOptionId) => {
     try {
         return database.query(`
             INSERT INTO recommend(
@@ -62,7 +62,7 @@ const paymentRecommendAdd = (userOptionId) => {
     }
 };
 
-const paymentQuantityCalculate = (quantityid) => {
+const orderQuantityCalculate = (quantityid) => {
     try {
         return database.query(`
             UPDATE products_option 
@@ -76,5 +76,5 @@ const paymentQuantityCalculate = (quantityid) => {
 };
 
 module.exports = {
-    paymentStatusAdd, productDetailCheck, pointCheck, paymentPointCalculate, paymentRecommendAdd, paymentQuantityCalculate
+    orderStatusAdd, productDetailCheck, pointCheck, orderPointCalculate, orderRecommendAdd, orderQuantityCalculate
 }
