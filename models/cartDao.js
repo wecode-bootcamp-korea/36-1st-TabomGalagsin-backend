@@ -1,5 +1,5 @@
 const { database } = require('./database');
-const { orderStatus } = require('../util/enum');
+const { orderStatus } = require('./orderStatusEnum');
 
 const productCheck = async (productId, sizeId, colorId) => {
     try{
