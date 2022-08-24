@@ -1,13 +1,13 @@
 const { database } = require('./database');
-const { orderStatus } = require('./orderStatusEnum');
+const { orderStatusEnum } = require('./enumCollection');
 
-const orderStatusAdd = (userId) => {
+const updateOrderStatus = (userId) => {
     try {
         return database.query(`
             UPDATE orders AS A INNER JOIN order_items AS B ON A.id = B.order_id  
             SET A.order_status_id = ?, B.order_status_id = ?
             WHERE A.user_id = ? AND A.order_status_id = ?`, 
-            [orderStatus.done, orderStatus.done, userId, orderStatus.order]
+            [orderStatusEnum.done, orderStatusEnum.done, userId, orderStatusEnum.order]
         ) 
     }
     catch (err) {    
@@ -15,7 +15,7 @@ const orderStatusAdd = (userId) => {
     }
 };
 
-const productDetailCheck = async (userId) => {
+const getProductDetail = async (userId) => {
     return database.query(`
         SELECT 
             product_option_id,
@@ -26,7 +26,7 @@ const productDetailCheck = async (userId) => {
     )
 }
 
-const pointCheck = async (userId) => {
+const getPoint = async (userId) => {
     return database.query(`
         SELECT 
             point 
@@ -35,7 +35,7 @@ const pointCheck = async (userId) => {
     )
 }
 
-const orderPointCalculate = (userId, totalPrice) => {
+const updateOrderPoint = (userId, totalPrice) => {
     try {
         return database.query(`
             UPDATE users 
@@ -48,7 +48,7 @@ const orderPointCalculate = (userId, totalPrice) => {
     }
 };
 
-const orderRecommendAdd = (userOptionId) => {
+const updateOrderRecommend = (userOptionId) => {
     try {
         return database.query(`
             INSERT INTO recommend(
@@ -62,7 +62,7 @@ const orderRecommendAdd = (userOptionId) => {
     }
 };
 
-const orderQuantityCalculate = (quantityid) => {
+const updateOrderQuantity = (quantityid) => {
     try {
         return database.query(`
             UPDATE products_option 
@@ -76,5 +76,5 @@ const orderQuantityCalculate = (quantityid) => {
 };
 
 module.exports = {
-    orderStatusAdd, productDetailCheck, pointCheck, orderPointCalculate, orderRecommendAdd, orderQuantityCalculate
+    updateOrderStatus, getProductDetail, getPoint, updateOrderPoint, updateOrderRecommend, updateOrderQuantity
 }
