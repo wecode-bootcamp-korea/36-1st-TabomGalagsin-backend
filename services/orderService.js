@@ -21,6 +21,8 @@ const orderPayment = async (totalPrice, decoded) => {
     for(let quantityid of quantityOptionId){
         await orderDao.updateOrderQuantity(quantityid)
     }
+    const remainPoint = await orderDao.getUserPoint(userId)
+    return Number(remainPoint[0].point)
 };
 
 module.exports = {

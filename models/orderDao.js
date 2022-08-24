@@ -7,7 +7,7 @@ const updateOrderStatus = (userId) => {
             UPDATE orders AS A INNER JOIN order_items AS B ON A.id = B.order_id  
             SET A.order_status_id = ?, B.order_status_id = ?
             WHERE A.user_id = ? AND A.order_status_id = ?`, 
-            [orderStatusEnum.done, orderStatusEnum.done, userId, orderStatusEnum.order]
+            [orderStatusEnum.order, orderStatusEnum.order, userId, orderStatusEnum.cart]
         ) 
     }
     catch (err) {    
@@ -75,6 +75,15 @@ const updateOrderQuantity = (quantityid) => {
     }
 };
 
+const getUserPoint = async (userId) => {
+    return database.query(`
+        SELECT 
+            point
+        from users
+        WHERE users.id = ?`, [userId]
+    )
+}
+
 module.exports = {
-    updateOrderStatus, getProductDetail, getPoint, updateOrderPoint, updateOrderRecommend, updateOrderQuantity
+    updateOrderStatus, getProductDetail, getPoint, updateOrderPoint, updateOrderRecommend, updateOrderQuantity, getUserPoint
 }
