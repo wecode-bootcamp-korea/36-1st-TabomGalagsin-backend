@@ -158,22 +158,19 @@ const getProductInfoByproductId = async (productId) => {
         ) AS size,
         (SELECT
             JSON_ARRAYAGG(JSON_OBJECT(
-                'colorId', stock.colorId,
-                'colorName', stock.colorName,
+                'sizeId', stock.sizeId,
                 'size', stock.size,
-                'stock', stock.stock)) JSONstock
-                FROM (SELECT DISTINCT 
-                        color.id colorId,
-                        color.color_name colorName,
-                        size.id sizeId,
-                        size.size,
-                        products_option.stock 
-                    FROM products
-                    INNER JOIN products_option
-                    ON products.id = products_option.product_id
-                    INNER JOIN size ON products_option.size_id = size.id
-                    INNER JOIN color ON products_option.color_id = color.id
-                    WHERE products.id = p.id) stock
+                'stock', stock.stock))JSONsize
+            FROM (SELECT DISTINCT 
+                size.id sizeId, 
+                size.size, 
+                products_option.stock 
+                FROM products
+                INNER JOIN products_option
+                ON products.id = products_option.product_id
+                INNER JOIN size ON products_option.size_id = size.id
+                INNER JOIN color ON products_option.color_id = color.id
+                WHERE products.id = p.id and color.id = 1) stock
         ) AS stock
         FROM products p
         WHERE p.id = ?
@@ -188,5 +185,10 @@ const getProductInfoByproductId = async (productId) => {
 }
 
 module.exports = {
-    productColorUrl, lookUpNew, lookUpRecommend, randomLookUp, checkColorId, getProductInfoByproductId
+    productColorUrl,
+    lookUpNew,
+    lookUpRecommend,
+    randomLookUp,
+    checkColorId,
+    getProductInfoByproductId
 }

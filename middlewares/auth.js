@@ -9,8 +9,8 @@ const validateToken = async (req, res, next) => {
             next(); 
         }
 	} catch (err) {
-		  res.status(401).json({ message : 'Invalid Access Token' })
-	  }
+		res.status(401).json({ message: 'Invalid Access Token' })
+	}
 };
 
 module.exports = {
