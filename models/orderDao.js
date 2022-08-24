@@ -7,7 +7,7 @@ const paymentStatusAdd = (userId) => {
             UPDATE orders AS A INNER JOIN order_items AS B ON A.id = B.order_id  
             SET A.order_status_id = ?, B.order_status_id = ?
             WHERE A.user_id = ? AND A.order_status_id = ?`, 
-            [orderStatus.done, orderStatus.done, userId, 2]
+            [orderStatus.done, orderStatus.done, userId, orderStatus.order]
         ) 
     }
     catch (err) {    
