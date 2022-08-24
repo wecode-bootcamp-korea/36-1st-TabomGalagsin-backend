@@ -46,5 +46,9 @@ const getProductDetailByproductId = async (productId) => {
 }
 
 module.exports = {
-    productColorLookUp, LookUpNew, lookUpRecommend, randomLookUp, getProductDetailByproductId
+    productColorLookUp,
+    LookUpNew,
+    lookUpRecommend,
+    randomLookUp,
+    getProductDetailByproductId
 }
