@@ -10,7 +10,7 @@ const LookUpNew = async () => {
 };
 
 const lookUpRecommend = async (decoded) => {
-    const userId = await Object.values(decoded)[0]
+    const userId = decoded.id
     const sql = await productDao.checkColorId(userId)
     const colorId = Object.values(sql[sql.length-1])[0] 
     const lookUpMain = await productDao.lookUpRecommend(colorId)
