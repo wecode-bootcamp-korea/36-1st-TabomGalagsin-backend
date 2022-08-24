@@ -1,11 +1,13 @@
 const { database } = require('./database');
+const { orderStatus } = require('../util/enum');
 
-const paymentStatus = (userId) => {
+const paymentStatusAdd = (userId) => {
     try {
         return database.query(`
             UPDATE orders AS A INNER JOIN order_items AS B ON A.id = B.order_id  
-            SET A.order_status_id = 3, B.order_status_id = 3
-            WHERE A.user_id = ? AND A.order_status_id = ?`, [userId, 2]
+            SET A.order_status_id = ?, B.order_status_id = ?
+            WHERE A.user_id = ? AND A.order_status_id = ?`, 
+            [orderStatus.done, orderStatus.done, userId, 2]
         ) 
     }
     catch (err) {    
@@ -13,7 +15,7 @@ const paymentStatus = (userId) => {
     }
 };
 
-const productDetail = async (userId) => {
+const productDetailCheck = async (userId) => {
     return database.query(`
         SELECT 
             product_option_id,
@@ -33,7 +35,7 @@ const pointCheck = async (userId) => {
     )
 }
 
-const paymentPoint = (userId, totalPrice) => {
+const paymentPointCalculate = (userId, totalPrice) => {
     try {
         return database.query(`
             UPDATE users 
@@ -46,7 +48,7 @@ const paymentPoint = (userId, totalPrice) => {
     }
 };
 
-const paymentRecommend = (userOptionId) => {
+const paymentRecommendAdd = (userOptionId) => {
     try {
         return database.query(`
             INSERT INTO recommend(
@@ -60,12 +62,12 @@ const paymentRecommend = (userOptionId) => {
     }
 };
 
-const paymentQuantity = (quantityOid) => {
+const paymentQuantityCalculate = (quantityid) => {
     try {
         return database.query(`
             UPDATE products_option 
             SET stock = stock - ?
-            WHERE id = ?`, quantityOid
+            WHERE id = ?`, quantityid
         ) 
     }
     catch (err) {    
@@ -74,5 +76,5 @@ const paymentQuantity = (quantityOid) => {
 };
 
 module.exports = {
-    paymentStatus, productDetail, pointCheck, paymentPoint, paymentRecommend, paymentQuantity
+    paymentStatusAdd, productDetailCheck, pointCheck, paymentPointCalculate, paymentRecommendAdd, paymentQuantityCalculate
 }
