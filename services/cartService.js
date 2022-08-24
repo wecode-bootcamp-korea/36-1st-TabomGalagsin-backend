@@ -1,9 +1,8 @@
 const cartDao = require('../models/cartDao');
 
 const createCart = async(productId, quantity, sizeId, colorId, userId) => {
-    const [checkResult] = await cartDao.inputDataCheck(productId, sizeId, colorId);
-    
-    if(Number(checkResult.result) === 0) {
+    const [{checkingProductResult}] = await cartDao.productCheck(productId, sizeId, colorId);
+    if(Number(checkingProductResult) === 0) {
         const error = new Error('KEY_VALUE_ERROR');
         error.statusCode = 400;
         throw error;
@@ -19,9 +18,9 @@ const createCart = async(productId, quantity, sizeId, colorId, userId) => {
     
     await cartDao.createOrder(userId)
     
-    const [productCheck] = await cartDao.checkingProduct(userId, productInfo.productOptionId);
+    const [{duplicateResult}] = await cartDao.duplicateProductCheck(userId, productInfo.productOptionId);
     
-    if(Number(productCheck.result) === 1) {
+    if(Number(duplicateResult) === 1) {
         const error = new Error('PRODUCT_ALREADY_EXISTS_IN_CART');
         error.statusCode = 400;
         throw error;

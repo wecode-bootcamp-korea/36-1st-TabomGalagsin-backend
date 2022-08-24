@@ -1,16 +1,17 @@
 const { database } = require('./database');
+const { orderStatus } = require('../util/enum');
 
-const inputDataCheck = async (productId, sizeId, colorId) => {
+const productCheck = async (productId, sizeId, colorId) => {
     try{
-        const result =await database.query(`
+        const checkingProductResult =await database.query(`
         SELECT EXISTS (
             SELECT po.id FROM products_option po
             WHERE po.product_id = ${productId}
             AND po.size_id = ${sizeId}
             AND po.color_id = ${colorId}
-        ) result ;
+        ) checkingProductResult ;
         `)
-        return JSON.parse(JSON.stringify(result))
+        return JSON.parse(JSON.stringify(checkingProductResult))
     } catch (err) {
         const error = new Error('INVALID_DATA_INPUT');
         error.statusCode = 500;
@@ -46,9 +47,9 @@ const createOrder = async (userId) => {
         INSERT INTO orders (
             user_id, 
             order_status_id)
-            SELECT ${userId}, 1 FROM orders
+            SELECT ${userId}, ${orderStatus.cart} FROM orders
             WHERE NOT EXISTS (SELECT id FROM orders
-                WHERE user_id = ${userId} AND order_status_id = 1);
+                WHERE user_id = ${userId} AND order_status_id = ${orderStatus.cart});
                 `);
     } catch (err) {
         const error = new Error('INVALID_DATA_INPUT');
@@ -57,17 +58,18 @@ const createOrder = async (userId) => {
     }
 }
 
-const checkingProduct = async (userId, productOptionId) => {
+const duplicateProductCheck = async (userId, productOptionId) => {
     try {
-        return await database.query(`
+        const duplicateResult = await database.query(`
                 SELECT EXISTS (
                     SELECT id 
                     FROM order_items 
                     WHERE order_id = 
                     (SELECT id FROM orders 
                         WHERE user_id = ${userId} 
-                        AND order_status_id = 1)
-                    AND products_option_id = ${productOptionId}) as result;`);
+                        AND order_status_id = ${orderStatus.cart})
+                    AND products_option_id = ${productOptionId}) as duplicateResult;`);
+        return JSON.parse(JSON.stringify(duplicateResult));
     } catch (err) {
         const error = new Error('INVALID_DATA_INPUT');
         error.statusCode = 500;
@@ -86,8 +88,10 @@ const createOrderItem = async (productOptionId, quantity, userId, price) => {
             total_price
         ) VALUES (
             ${productOptionId},
-            (SELECT id FROM orders WHERE user_id = ${userId} AND order_status_id = 1),
-            1,
+            (SELECT id FROM orders
+                WHERE user_id = ${userId}
+                AND order_status_id = ${orderStatus.cart}),
+            ${orderStatus.cart},
             ${quantity},
             ${price})`)
         return
@@ -99,9 +103,9 @@ const createOrderItem = async (productOptionId, quantity, userId, price) => {
 }
 
 module.exports = {
-    inputDataCheck,
+    productCheck,
     createOrder,
+    duplicateProductCheck,
     createOrderItem,
-    getProductInfo,
-    checkingProduct
+    getProductInfo
 }
