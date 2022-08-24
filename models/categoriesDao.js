@@ -8,7 +8,7 @@ const getProductByType = async (typeId) => {
             p.name,
             p.price,
             p.is_new,
-            p.thumbnail_url imageUrl,
+            p.thumbnail_url thumbnailUrl,
             (SELECT
                 JSON_ARRAYAGG(JSON_OBJECT(
                     'colorId', c.id,
@@ -72,7 +72,7 @@ const getProductByColor = async (colorId) => {
             p.name,
             p.price,
             p.is_new,
-            p.thumbnail_url imageUrl,
+            p.thumbnail_url thumbnailUrl,
 		    (SELECT 
                 JSON_ARRAYAGG(JSON_OBJECT(
                     'colorId', c.id, 
