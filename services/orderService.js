@@ -1,5 +1,11 @@
 const orderDao = require('../models/orderDao')
 
+const lookUpPoint = async (decoded) => {
+    const userId = decoded.id
+    const lookUpPoint = await orderDao.getPoint(userId)
+    return Number(lookUpPoint[0].point);
+};
+
 const orderPayment = async (totalPrice, decoded) => {
     const userId = await decoded.id
     const productDetail = await orderDao.getProductDetail(userId)
@@ -26,5 +32,5 @@ const orderPayment = async (totalPrice, decoded) => {
 };
 
 module.exports = {
-    orderPayment
+    lookUpPoint, orderPayment
 }
