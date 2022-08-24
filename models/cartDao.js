@@ -1,5 +1,5 @@
 const { database } = require('./database');
-const { orderStatus } = require('./orderStatusEnum');
+const { orderStatusEnum } = require('./enumCollection');
 
 const productCheck = async (productId, sizeId, colorId) => {
     try{
@@ -47,9 +47,9 @@ const createOrder = async (userId) => {
         INSERT INTO orders (
             user_id, 
             order_status_id)
-            SELECT ${userId}, ${orderStatus.cart} FROM orders
+            SELECT ${userId}, ${orderStatusEnum.cart} FROM orders
             WHERE NOT EXISTS (SELECT id FROM orders
-                WHERE user_id = ${userId} AND order_status_id = ${orderStatus.cart});
+                WHERE user_id = ${userId} AND order_status_id = ${orderStatusEnum.cart});
                 `);
     } catch (err) {
         const error = new Error('INVALID_DATA_INPUT');
@@ -67,7 +67,7 @@ const duplicateProductCheck = async (userId, productOptionId) => {
                     WHERE order_id = 
                     (SELECT id FROM orders 
                         WHERE user_id = ${userId} 
-                        AND order_status_id = ${orderStatus.cart})
+                        AND order_status_id = ${orderStatusEnum.cart})
                     AND products_option_id = ${productOptionId}) as duplicateResult;`);
         return JSON.parse(JSON.stringify(duplicateResult));
     } catch (err) {
@@ -90,8 +90,8 @@ const createOrderItem = async (productOptionId, quantity, userId, price) => {
             ${productOptionId},
             (SELECT id FROM orders
                 WHERE user_id = ${userId}
-                AND order_status_id = ${orderStatus.cart}),
-            ${orderStatus.cart},
+                AND order_status_id = ${orderStatusEnum.cart}),
+            ${orderStatusEnum.cart},
             ${quantity},
             ${price})`)
         return
