@@ -1,7 +1,7 @@
 const { database } = require('./database');
 const { orderStatusEnum } = require('./enumCollection');
 
-const checkingInputData = async (productId, sizeId, colorId) => {
+const checkIfProductExists = async (productId, sizeId, colorId) => {
     try{
         const checkingProductResult = await database.query(`
         SELECT EXISTS (
@@ -40,7 +40,7 @@ const getProductInfo = async (productId, sizeId, colorId) => {
     }
 }
 
-const checkingOrderId = async (userId) => {
+const checkOrderId = async (userId) => {
     try {
         return await database.query(`
         SELECT id FROM orders WHERE user_id = ? AND order_status_id = ?;
@@ -58,10 +58,8 @@ const createOrder = async (userId) => {
         INSERT INTO orders (
             user_id, 
             order_status_id)
-            SELECT ${userId}, ${orderStatusEnum.cart} FROM orders
-            WHERE NOT EXISTS (SELECT id FROM orders
-                WHERE user_id = ${userId} AND order_status_id = ${orderStatusEnum.cart});
-                `);
+        VALUES (?, ?);
+        `, [userId, orderStatusEnum.cart]);
     } catch (err) {
         const error = new Error('INVALID_DATA_INPUT');
         error.statusCode = 500;
@@ -69,7 +67,7 @@ const createOrder = async (userId) => {
     }
 }
 
-const duplicateProductCheck = async (userId, productOptionId) => {
+const checkDuplicateProduct = async (userId, productOptionId) => {
     try {
         const duplicateResult = await database.query(`
                 SELECT EXISTS (
@@ -148,7 +146,7 @@ const getOrderItem = async (orderId) => {
     }
 }
 
-const checkingCart = async (userId, orderItemsId) => {
+const checkIfCartExists = async (userId, orderItemsId) => {
     try {
         return await database.query(`
         SELECT EXISTS (
@@ -207,15 +205,15 @@ const deleteCart = async (orderItemsId) => {
 }
 
 module.exports = {
-    checkingInputData,
+    checkIfProductExists,
     createOrder,
     createOrderItem,
     getProductInfo,
-    checkingOrderId,
+    checkOrderId,
     getOrderItem,
     updateCart,
     deleteCart,
-    checkingCart,
+    checkIfCartExists,
     getProductStock,
-    duplicateProductCheck
+    checkDuplicateProduct
 }

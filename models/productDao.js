@@ -43,15 +43,23 @@ const lookUpNew = () => {
 
 const productColorUrl = (productId, colorId) => {
     return database.query(`
-        SELECT
-            product_id AS productId, 
-            image_url AS thumbnailUrl,
-            color_id AS colorId,
-            color_name AS colorName
-        FROM product_image
-        INNER JOIN color ON color_id = color.id
-        WHERE product_id = ? AND color_id = ?`, [productId, colorId]
-    )
+    SELECT
+	    pi.image_url thumbnailUrl,
+	    JSON_ARRAYAGG(JSON_OBJECT(
+            'sizeId', s.id,
+            'size', s.size,
+            'stock', po.stock)) size
+    FROM products p
+    INNER JOIN products_option po
+    ON p.id = po.product_id
+    INNER JOIN color c
+    ON po.color_id = c.id
+    INNER JOIN size s
+    ON po.size_id = s.id
+    INNER JOIN product_image pi
+    ON pi.product_id = p.id AND pi.color_id = c.id
+    WHERE p.id = ${productId} AND c.id = ${colorId} 
+    GROUP BY p.id, pi.image_url;`)
 };
 
 const lookUpRecommend = async (colorId) => {
@@ -139,12 +147,22 @@ const randomLookUp = () => {
 
 const checkColorId = (userId) => {
     return database.query(`
-        SELECT 
-            products_option.color_id
-        from users
+        SELECT products_option.color_id
+        FROM users
         INNER JOIN recommend ON recommend.user_id = users.id
         INNER JOIN products_option ON products_option.id = recommend.products_option_id
-        WHERE users.id = ?`, [userId]
+        WHERE users.id = ?
+        GROUP BY products_option.color_id
+        HAVING count(products_option.id) =
+        (SELECT max(mycount) 
+        FROM (SELECT
+            products_option.color_id,
+            count(products_option.id) AS mycount
+        FROM users
+        INNER JOIN recommend ON recommend.user_id = users.id
+        INNER JOIN products_option ON products_option.id = recommend.products_option_id
+        WHERE users.id = ?
+        GROUP BY products_option.color_id) AS result)`, [userId, userId]
     )
 }
 
