@@ -7,7 +7,8 @@ const errorHandler = (err, res) => {
 const getCategoryListByType = async (req, res) => {
     try {
         const { typeId } = req.params;
-        const products = await categoriesService.searchByType(typeId);
+        const query = req.query;
+        const products = await categoriesService.searchByType(typeId, query);
         return res.status(200).json({ products: products });
     } catch (err) {
         errorHandler(err, res);
@@ -17,7 +18,8 @@ const getCategoryListByType = async (req, res) => {
 const getCategoryListByColor = async (req, res) => {
     try {
         const { colorId } = req.params;
-        const products = await categoriesService.searchByColor(colorId);
+        const query = req.query;
+        const products = await categoriesService.searchByColor(colorId, query);
         return res.status(200).json({ products: products });
     } catch (err) {
         errorHandler(err, res);
