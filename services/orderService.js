@@ -15,7 +15,6 @@ const orderPayment = async (totalPrice, decoded) => {
         userOptionId.push([userId, pDetail.products_option_id])
         quantityOptionId.push([pDetail.quantity, pDetail.products_option_id])
     }
-    await orderDao.updateOrderStatus(userId)
     const pointCheck = await orderDao.getPoint(userId)
     if(Number(pointCheck[0].point) <= totalPrice){
         const err = new Error('not enough points')
@@ -27,6 +26,7 @@ const orderPayment = async (totalPrice, decoded) => {
     for(let quantityid of quantityOptionId){
         await orderDao.updateOrderQuantity(quantityid)
     }
+    await orderDao.updateOrderStatus(userId)
     const remainPoint = await orderDao.getUserPoint(userId)
     return Number(remainPoint[0].point)
 };
