@@ -81,7 +81,7 @@ const getProductByColor = async (colorId, sort, priceLimitRange, theme) => {
             p.is_new,
             t.type category,
             pi.image_url thumbnailUrl,
-		    (SELECT
+		    (SELECT 
                 JSON_ARRAYAGG(JSON_OBJECT(
                     'colorId', c.id,
                     'color', c.color_name,
@@ -135,8 +135,12 @@ const getProductByColor = async (colorId, sort, priceLimitRange, theme) => {
         INNER JOIN color
         ON color.id = products_option.color_id
         INNER JOIN product_image pi
-        ON pi.color_id = color.id AND pi.product_id = p.id
-        WHERE color.id = ${colorId} AND p.price >= ? AND p.price < ? AND theme LIKE ?
+        ON pi.color_id = color.id
+        AND pi.product_id = p.id
+        WHERE color.id = ${colorId}
+        AND p.price >= ?
+        AND p.price < ?
+        AND theme LIKE ?
         GROUP by p.id, pi.image_url
         ORDER BY ${sort};`
         , [Number(priceLimitRange[0]), Number(priceLimitRange[1]), theme]);
