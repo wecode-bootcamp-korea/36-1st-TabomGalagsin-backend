@@ -2,33 +2,42 @@ const { database } = require('./database');
 
 const lookUpNew = () => {
     return database.query(`
-        SELECT  
-            p.id AS productId,
-            p.name,
-            p.price,
-            product_image.image_url AS thumbnailUrl,
-            p.type_id,
-            (SELECT 
-                JSON_ARRAYAGG(JSON_OBJECT(
-                    'colorId', c.id, 'color', c.color_name)) JSONcolor
-                FROM (SELECT DISTINCT color.id, color.color_name
-            FROM products
-                INNER JOIN products_option ON products.id = products_option.product_id
+    SELECT  
+        p.id AS productId,
+        p.name,
+        p.price,
+        p.is_new,
+        p.thumbnail_url AS thumbnailUrl,
+        p.type_id,
+        (SELECT
+            JSON_ARRAYAGG(JSON_OBJECT(
+                'colorId', c.id,
+                'color', c.color_name,
+                'thumbnailUrl', c.image_url)) JSONcolor
+            FROM (SELECT DISTINCT 
+                    color.id,
+                    color.color_name,
+                    product_image.image_url
+                FROM products
+                INNER JOIN products_option
+                ON products.id = products_option.product_id
                 INNER JOIN color ON products_option.color_id = color.id
+                INNER JOIN product_image ON product_image.product_id = products.id
+                AND product_image.color_id = color.id
                 WHERE products.id = p.id) c) color,
-            (SELECT
-                JSON_ARRAYAGG(JSON_OBJECT(
-                    'sizeId', s.id, 'size', s.size)) JSONsize
-                FROM (SELECT DISTINCT size.id, size.size
-            FROM products
-                INNER JOIN products_option ON products.id = products_option.product_id
-                INNER JOIN size ON products_option.size_id = size.id
-                WHERE products.id = p.id) s ) AS size
-        FROM products p
-        INNER JOIN product_image ON p.id = product_image.product_id
-        WHERE is_new = TRUE AND product_image.color_id = 1
-        GROUP BY p.id, product_image.image_url
-        ORDER BY RAND() LIMIT 4`   
+        (SELECT
+            JSON_ARRAYAGG(JSON_OBJECT(
+                'sizeId', s.id, 'size', s.size)) JSONsize
+            FROM (SELECT DISTINCT size.id, size.size
+        FROM products
+        INNER JOIN products_option ON products.id = products_option.product_id
+        INNER JOIN size ON products_option.size_id = size.id
+        WHERE products.id = p.id) s ) AS size
+    FROM products p
+    INNER JOIN products_option ON p.id = products_option.product_id
+    WHERE p.is_new = true AND products_option.stock > 0
+    GROUP BY p.id
+    ORDER BY RAND() LIMIT 4`
     )
 };
 
@@ -47,65 +56,84 @@ const productColorUrl = (productId, colorId) => {
 
 const lookUpRecommend = async (colorId) => {
     return database.query(`
-        SELECT  
-            p.id AS productId,
-            p.name,
-            p.price,
-            product_image.image_url AS thumbnailUrl,
-            p.type_id,
-            (SELECT 
-                JSON_ARRAYAGG(JSON_OBJECT(
-                    'colorId', c.id, 'color', c.color_name)) JSONcolor
-                FROM (SELECT DISTINCT color.id, color.color_name
-            FROM products
-                INNER JOIN products_option ON products.id = products_option.product_id
+    SELECT  
+        p.id AS productId,
+        p.name,
+        p.price,
+        product_image.image_url AS thumbnailUrl,
+        p.type_id,
+        (SELECT
+            JSON_ARRAYAGG(JSON_OBJECT(
+                'colorId', c.id,
+                'color', c.color_name,
+                'thumbnailUrl', c.image_url)) JSONcolor
+            FROM (SELECT DISTINCT 
+                    color.id,
+                    color.color_name,
+                    product_image.image_url
+                FROM products
+                INNER JOIN products_option
+                ON products.id = products_option.product_id
                 INNER JOIN color ON products_option.color_id = color.id
+                INNER JOIN product_image ON product_image.product_id = products.id
+                AND product_image.color_id = color.id
                 WHERE products.id = p.id) c) color,
-            (SELECT
-                JSON_ARRAYAGG(JSON_OBJECT(
-                    'sizeId', s.id, 'size', s.size)) JSONsize
-                FROM (SELECT DISTINCT size.id, size.size
-            FROM products
-                INNER JOIN products_option ON products.id = products_option.product_id
-                INNER JOIN size ON products_option.size_id = size.id
-                WHERE products.id = p.id) s ) AS size
-        FROM products p
-        LEFT JOIN product_image ON p.id = product_image.product_id
-        WHERE product_image.color_id = ?
-        GROUP BY p.id, product_image.image_url
-        ORDER BY RAND() LIMIT 4`, [colorId]   
+        (SELECT
+            JSON_ARRAYAGG(JSON_OBJECT(
+                'sizeId', s.id, 'size', s.size)) JSONsize
+            FROM (SELECT DISTINCT size.id, size.size
+        FROM products
+            INNER JOIN products_option ON products.id = products_option.product_id
+            INNER JOIN size ON products_option.size_id = size.id
+            WHERE products.id = p.id) s ) AS size
+    FROM products p
+    LEFT JOIN product_image ON p.id = product_image.product_id
+    INNER JOIN products_option ON p.id = products_option.product_id
+    WHERE product_image.color_id = ? AND products_option.stock > 0
+    GROUP BY p.id, product_image.image_url
+    ORDER BY RAND() LIMIT 4`, [colorId]   
     )
 }
 
 const randomLookUp = () => {
     return database.query(`
-        SELECT  
-            p.id AS productId,
-            p.name,
-            p.price,
-            product_image.image_url AS thumbnailUrl,
-            p.type_id,
-            (SELECT 
-                JSON_ARRAYAGG(JSON_OBJECT(
-                    'colorId', c.id, 'color', c.color_name)) JSONcolor
-                FROM (SELECT DISTINCT color.id, color.color_name
-            FROM products
-                INNER JOIN products_option ON products.id = products_option.product_id
+    SELECT  
+        p.id AS productId,
+        p.name,
+        p.price,
+        p.is_new,
+        p.thumbnail_url AS thumbnailUrl,
+        products_option.stock,
+        p.type_id,
+        (SELECT
+            JSON_ARRAYAGG(JSON_OBJECT(
+                'colorId', c.id,
+                'color', c.color_name,
+                'thumbnailUrl', c.image_url)) JSONcolor
+            FROM (SELECT DISTINCT 
+                    color.id,
+                    color.color_name,
+                    product_image.image_url
+                FROM products
+                INNER JOIN products_option
+                ON products.id = products_option.product_id
                 INNER JOIN color ON products_option.color_id = color.id
+                INNER JOIN product_image ON product_image.product_id = products.id
+                AND product_image.color_id = color.id
                 WHERE products.id = p.id) c) color,
-            (SELECT
-                JSON_ARRAYAGG(JSON_OBJECT(
-                    'sizeId', s.id, 'size', s.size)) JSONsize
-                FROM (SELECT DISTINCT size.id, size.size
-            FROM products
-                INNER JOIN products_option ON products.id = products_option.product_id
-                INNER JOIN size ON products_option.size_id = size.id
-                WHERE products.id = p.id) s ) AS size
-        FROM products p
-        LEFT JOIN product_image ON p.id = product_image.product_id
-        WHERE product_image.color_id = 1
-        GROUP BY p.id, product_image.image_url
-        ORDER BY RAND() LIMIT 4`   
+        (SELECT
+            JSON_ARRAYAGG(JSON_OBJECT(
+                'sizeId', s.id, 'size', s.size)) JSONsize
+            FROM (SELECT DISTINCT size.id, size.size
+        FROM products
+        INNER JOIN products_option ON products.id = products_option.product_id
+        INNER JOIN size ON products_option.size_id = size.id
+        WHERE products.id = p.id) s ) AS size
+    FROM products p
+    INNER JOIN products_option ON p.id = products_option.product_id
+    WHERE products_option.stock > 0
+    GROUP BY p.id, products_option.stock
+    ORDER BY RAND() LIMIT 4;`
     )
 }
 
@@ -124,55 +152,62 @@ const getProductInfoByproductId = async (productId) => {
     try {
         return await database.query(`
         SELECT 
-        p.id productId,
-        p.name,
-        p.price,
-        p.description,
-        p.is_new,
-        p.thumbnail_url imageUrl,
-		(SELECT
-            JSON_ARRAYAGG(JSON_OBJECT(
-                'colorId', c.id,
-                'color', c.color_name)) JSONcolor
-            FROM (SELECT DISTINCT 
-                    color.id,
-                    color.color_name
-                FROM products
-                INNER JOIN products_option
-                ON products.id = products_option.product_id
-                INNER JOIN color ON products_option.color_id = color.id
-                WHERE products.id = p.id) c
-        ) color,
-        (SELECT
-            JSON_ARRAYAGG(JSON_OBJECT(
-                'sizeId', s.id,
-                'size', s.size)) JSONsize
+            p.id productId,
+            p.name,
+            p.price,
+            p.description,
+            p.is_new,
+            t.type category,
+            p.thumbnail_url thumbnailUrl,
+            (SELECT
+                JSON_ARRAYAGG(JSON_OBJECT(
+                    'colorId', c.id,
+                    'color', c.color_name,
+                    'thumbnailUrl', c.image_url)) JSONcolor
                 FROM (SELECT DISTINCT 
-                    size.id,
-                    size.size 
-                FROM products
-                INNER JOIN products_option
-                ON products.id = products_option.product_id
-                INNER JOIN size ON products_option.size_id = size.id
-                WHERE products.id = p.id) s
-        ) AS size,
-        (SELECT
-            JSON_ARRAYAGG(JSON_OBJECT(
-                'sizeId', stock.sizeId,
-                'size', stock.size,
-                'stock', stock.stock))JSONsize
-            FROM (SELECT DISTINCT 
-                size.id sizeId, 
-                size.size, 
-                products_option.stock 
-                FROM products
-                INNER JOIN products_option
-                ON products.id = products_option.product_id
-                INNER JOIN size ON products_option.size_id = size.id
-                INNER JOIN color ON products_option.color_id = color.id
-                WHERE products.id = p.id and color.id = 1) stock
-        ) AS stock
+                        color.id,
+                        color.color_name,
+                        product_image.image_url
+                    FROM products
+                    INNER JOIN products_option
+                    ON products.id = products_option.product_id
+                    INNER JOIN color ON products_option.color_id = color.id
+                    INNER JOIN product_image ON product_image.product_id = products.id
+                    AND product_image.color_id = color.id
+                    WHERE products.id = p.id) c
+            ) color,
+            (SELECT
+                JSON_ARRAYAGG(JSON_OBJECT(
+                    'sizeId', s.id,
+                    'size', s.size)) JSONsize
+                    FROM (SELECT DISTINCT 
+                        size.id,
+                        size.size 
+                    FROM products
+                    INNER JOIN products_option
+                    ON products.id = products_option.product_id
+                    INNER JOIN size ON products_option.size_id = size.id
+                    WHERE products.id = p.id) s
+            ) AS size,
+            (SELECT
+                JSON_ARRAYAGG(JSON_OBJECT(
+                    'sizeId', stock.sizeId,
+                    'size', stock.size,
+                    'stock', stock.stock))JSONsize
+                FROM (SELECT DISTINCT 
+                    size.id sizeId, 
+                    size.size, 
+                    products_option.stock 
+                    FROM products
+                    INNER JOIN products_option
+                    ON products.id = products_option.product_id
+                    INNER JOIN size ON products_option.size_id = size.id
+                    INNER JOIN color ON products_option.color_id = color.id
+                    WHERE products.id = p.id) stock
+            ) AS stock
         FROM products p
+        INNER JOIN products_type t
+        ON p.type_id = t.id
         WHERE p.id = ?
         GROUP by p.id
         ORDER BY p.id;`

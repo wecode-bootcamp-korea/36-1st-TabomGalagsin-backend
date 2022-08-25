@@ -8,7 +8,8 @@ const getProductByType = async (typeId) => {
             p.name,
             p.price,
             p.is_new,
-            p.thumbnail_url imageUrl,
+            t.type category,
+            p.thumbnail_url thumbnailUrl,
             (SELECT
                 JSON_ARRAYAGG(JSON_OBJECT(
                     'colorId', c.id,
@@ -52,6 +53,8 @@ const getProductByType = async (typeId) => {
                     WHERE products.id = p.id and color.id = 1) stock
             ) AS stock
         FROM products p
+        INNER JOIN products_type t
+        ON p.type_id = t.id
         WHERE p.type_id = ?
         GROUP by p.id
         ORDER BY p.id;`
@@ -72,7 +75,8 @@ const getProductByColor = async (colorId) => {
             p.name,
             p.price,
             p.is_new,
-            p.thumbnail_url imageUrl,
+            t.type category,
+            pi.image_url thumbnailUrl,
 		    (SELECT 
                 JSON_ARRAYAGG(JSON_OBJECT(
                     'colorId', c.id, 
@@ -116,12 +120,16 @@ const getProductByColor = async (colorId) => {
                     WHERE products.id = p.id and color.id = ${colorId}) stock
             ) AS stock
         FROM products p
+        INNER JOIN products_type t
+        ON p.type_id = t.id
         INNER JOIN products_option
         ON p.id = products_option.product_id
         INNER JOIN color
         ON color.id = products_option.color_id
+        INNER JOIN product_image pi
+        ON pi.color_id = color.id AND pi.product_id = p.id
         WHERE color.id = ${colorId}
-        GROUP by p.id
+        GROUP by p.id, pi.image_url
         ORDER BY p.id;`);
         return JSON.parse(JSON.stringify(result));
     } catch (err) {
