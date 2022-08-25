@@ -47,17 +47,17 @@ const convertThemeValue = (query) => {
 
 const searchByType = async (typeId, query) => {
     const sort = convertSortValue(query)
-    const limit = convertPriceValue(query)
+    const priceLimitRange = convertPriceValue(query)
     const theme = convertThemeValue(query)
-    const productInfos = await categoriesDao.getProductByType(typeId, sort, limit, theme)
+    const productInfos = await categoriesDao.getProductByType(typeId, sort, priceLimitRange, theme)
     return await convertJson(productInfos);
 }
 
 const searchByColor = async (colorId, query) => {
     const sort = convertSortValue(query)
-    const limit = convertPriceValue(query)
+    const priceLimitRange = convertPriceValue(query)
     const theme = convertThemeValue(query)
-    const productInfos = await categoriesDao.getProductByColor(colorId, sort, limit, theme)
+    const productInfos = await categoriesDao.getProductByColor(colorId, sort, priceLimitRange, theme)
     return await convertJson(productInfos);
 }
 

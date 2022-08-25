@@ -1,6 +1,6 @@
 const { database } = require('./database');
 
-const getProductByType = async (typeId, sort, limit, theme) => {
+const getProductByType = async (typeId, sort, priceLimitRange, theme) => {
     try {
         const result = await database.query(`
         SELECT 
@@ -62,7 +62,7 @@ const getProductByType = async (typeId, sort, limit, theme) => {
         WHERE p.type_id = ? AND p.price >= ? AND p.price <= ? AND theme LIKE ?
         GROUP by p.id
         ORDER BY ${sort};`
-        , [typeId, Number(limit[0]), Number(limit[1]), theme]);
+        , [typeId, Number(priceLimitRange[0]), Number(priceLimitRange[1]), theme]);
         return JSON.parse(JSON.stringify(result));
     } catch (err) {
         const error = new Error('INVALID_DATA_INPUT');
@@ -71,7 +71,7 @@ const getProductByType = async (typeId, sort, limit, theme) => {
     }
 }
 
-const getProductByColor = async (colorId, sort, limit, theme) => {
+const getProductByColor = async (colorId, sort, priceLimitRange, theme) => {
     try {
         const result = await database.query(`
         SELECT 
@@ -139,7 +139,7 @@ const getProductByColor = async (colorId, sort, limit, theme) => {
         WHERE color.id = ${colorId} AND p.price >= ? AND p.price < ? AND theme LIKE ?
         GROUP by p.id, pi.image_url
         ORDER BY ${sort};`
-        , [Number(limit[0]), Number(limit[1]), theme]);
+        , [Number(priceLimitRange[0]), Number(priceLimitRange[1]), theme]);
         return JSON.parse(JSON.stringify(result));
     } catch (err) {
         const error = new Error('INVALID_DATA_INPUT');
