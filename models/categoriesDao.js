@@ -1,6 +1,6 @@
 const { database } = require('./database');
 
-const getProductByType = async (typeId) => {
+const getProductByType = async (typeId, sort, priceLimitRange, theme) => {
     try {
         const result = await database.query(`
         SELECT 
@@ -13,16 +13,20 @@ const getProductByType = async (typeId) => {
             (SELECT
                 JSON_ARRAYAGG(JSON_OBJECT(
                     'colorId', c.id,
-                    'color', c.color_name)) JSONcolor
+                    'color', c.color_name,
+                    'thumbnailUrl', c.image_url)) JSONcolor
                 FROM (SELECT DISTINCT 
-                    color.id,
-                    color.color_name
+                        color.id,
+                        color.color_name,
+                        product_image.image_url
                     FROM products
                     INNER JOIN products_option
                     ON products.id = products_option.product_id
                     INNER JOIN color ON products_option.color_id = color.id
+                    INNER JOIN product_image ON product_image.product_id = products.id
+                    AND product_image.color_id = color.id
                     WHERE products.id = p.id) c
-                ) color,
+            ) color,
             (SELECT
                 JSON_ARRAYAGG(JSON_OBJECT(
                     'sizeId', s.id,
@@ -55,10 +59,10 @@ const getProductByType = async (typeId) => {
         FROM products p
         INNER JOIN products_type t
         ON p.type_id = t.id
-        WHERE p.type_id = ?
+        WHERE p.type_id = ? AND p.price >= ? AND p.price <= ? AND theme LIKE ?
         GROUP by p.id
-        ORDER BY p.id;`
-        , [typeId]);
+        ORDER BY ${sort};`
+        , [typeId, Number(priceLimitRange[0]), Number(priceLimitRange[1]), theme]);
         return JSON.parse(JSON.stringify(result));
     } catch (err) {
         const error = new Error('INVALID_DATA_INPUT');
@@ -67,7 +71,7 @@ const getProductByType = async (typeId) => {
     }
 }
 
-const getProductByColor = async (colorId) => {
+const getProductByColor = async (colorId, sort, priceLimitRange, theme) => {
     try {
         const result = await database.query(`
         SELECT 
@@ -79,15 +83,19 @@ const getProductByColor = async (colorId) => {
             pi.image_url thumbnailUrl,
 		    (SELECT 
                 JSON_ARRAYAGG(JSON_OBJECT(
-                    'colorId', c.id, 
-                    'color', c.color_name)) JSONcolor
-                FROM (Select DISTINCT 
-                    color.id,
-                    color.color_name 
+                    'colorId', c.id,
+                    'color', c.color_name,
+                    'thumbnailUrl', c.image_url)) JSONcolor
+                FROM (SELECT DISTINCT 
+                        color.id,
+                        color.color_name,
+                        product_image.image_url
                     FROM products
                     INNER JOIN products_option
                     ON products.id = products_option.product_id
                     INNER JOIN color ON products_option.color_id = color.id
+                    INNER JOIN product_image ON product_image.product_id = products.id
+                    AND product_image.color_id = color.id
                     WHERE products.id = p.id) c
             ) color,
 		    (SELECT
@@ -127,10 +135,15 @@ const getProductByColor = async (colorId) => {
         INNER JOIN color
         ON color.id = products_option.color_id
         INNER JOIN product_image pi
-        ON pi.color_id = color.id AND pi.product_id = p.id
+        ON pi.color_id = color.id
+        AND pi.product_id = p.id
         WHERE color.id = ${colorId}
+        AND p.price >= ?
+        AND p.price < ?
+        AND theme LIKE ?
         GROUP by p.id, pi.image_url
-        ORDER BY p.id;`);
+        ORDER BY ${sort};`
+        , [Number(priceLimitRange[0]), Number(priceLimitRange[1]), theme]);
         return JSON.parse(JSON.stringify(result));
     } catch (err) {
         const error = new Error('INVALID_DATA_INPUT');
