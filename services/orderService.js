@@ -11,9 +11,9 @@ const orderPayment = async (totalPrice, decoded) => {
     const productDetail = await orderDao.getProductDetail(userId)
     const userOptionId = [];
     const quantityOptionId = [];
-    for(let pDetail of productDetail){
-        userOptionId.push([userId, pDetail.products_option_id])
-        quantityOptionId.push([pDetail.quantity, pDetail.products_option_id])
+    for(let detail of productDetail){
+        userOptionId.push([userId, detail.products_option_id])
+        quantityOptionId.push([detail.quantity, detail.products_option_id])
     }
     const pointCheck = await orderDao.getPoint(userId)
     if(Number(pointCheck[0].point) <= totalPrice){

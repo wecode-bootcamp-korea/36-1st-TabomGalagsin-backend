@@ -12,7 +12,10 @@ const LookUpNew = async () => {
 const lookUpRecommend = async (decoded) => {
     const userId = decoded.id
     const sql = await productDao.checkColorId(userId)
-    const colorId = Object.values(sql[sql.length-1])[0] 
+    if(sql.length === 0){
+        sql.push({color_id : 1})
+    }
+    const colorId = sql[0].color_id
     const lookUpMain = await productDao.lookUpRecommend(colorId)
     for(let type of lookUpMain){
         type.color = JSON.parse(type.color)

@@ -118,12 +118,22 @@ const randomLookUp = () => {
 
 const checkColorId = (userId) => {
     return database.query(`
-        SELECT 
-            products_option.color_id
-        from users
+        SELECT products_option.color_id
+        FROM users
         INNER JOIN recommend ON recommend.user_id = users.id
         INNER JOIN products_option ON products_option.id = recommend.products_option_id
-        WHERE users.id = ?`, [userId]
+        WHERE users.id = ?
+        GROUP BY products_option.color_id
+        HAVING count(products_option.id) =
+        (SELECT max(mycount) 
+        FROM (SELECT
+            products_option.color_id,
+            count(products_option.id) AS mycount
+        FROM users
+        INNER JOIN recommend ON recommend.user_id = users.id
+        INNER JOIN products_option ON products_option.id = recommend.products_option_id
+        WHERE users.id = ?
+        GROUP BY products_option.color_id) AS result)`, [userId, userId]
     )
 }
 

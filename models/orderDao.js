@@ -22,7 +22,7 @@ const getProductDetail = async (userId) => {
             quantity 
         from orders
         INNER JOIN order_items ON order_items.order_id = order_id
-        WHERE orders.user_id = ?`, [userId]
+        WHERE orders.user_id = ? AND orders.order_status_id = ?`, [userId, orderStatusEnum.cart]
     )
 }
 
@@ -67,7 +67,7 @@ const updateOrderQuantity = (quantityid) => {
         return database.query(`
             UPDATE products_option 
             SET stock = stock - ?
-            WHERE id = ?`, quantityid
+            WHERE id = ?`, [quantityid[0], quantityid[1]]
         ) 
     }
     catch (err) {    
