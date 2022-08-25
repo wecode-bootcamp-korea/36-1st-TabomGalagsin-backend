@@ -12,22 +12,17 @@ const emailCheck = async (email) => {
 }
 
 const createUser = async (firstName, lastName, nickName, email, address, password) => {
-    try {
-        return database.query(`
-            INSERT INTO users(
-                first_name, 
-                last_name, 
-                nick_name, 
-                email,
-                address,
-                password
-            ) VALUES (?, ?, ?, ?, ?, ?)`, 
-            [firstName, lastName, nickName, email, address, password]
-        ) 
-    }
-    catch (err) {    
-        throw new Error('INVALID_DATA_INPUT')
-    }
+    return database.query(`
+        INSERT INTO users(
+            first_name, 
+            last_name, 
+            nick_name, 
+            email,
+            address,
+            password
+        ) VALUES (?, ?, ?, ?, ?, ?)`, 
+        [firstName, lastName, nickName, email, address, password]
+    ) 
 };
 
 const idUser = async (email) => {

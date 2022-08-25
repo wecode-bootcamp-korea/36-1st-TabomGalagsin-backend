@@ -2,17 +2,12 @@ const { database } = require('./database');
 const { orderStatusEnum } = require('./enumCollection');
 
 const updateOrderStatus = (userId) => {
-    try {
-        return database.query(`
-            UPDATE orders AS A INNER JOIN order_items AS B ON A.id = B.order_id  
-            SET A.order_status_id = ?, B.order_status_id = ?
-            WHERE A.user_id = ? AND A.order_status_id = ?`, 
-            [orderStatusEnum.order, orderStatusEnum.order, userId, orderStatusEnum.cart]
-        ) 
-    }
-    catch (err) {    
-        throw new Error('INVALID_DATA_INPUT')
-    }
+    return database.query(`
+        UPDATE orders AS A INNER JOIN order_items AS B ON A.id = B.order_id  
+        SET A.order_status_id = ?, B.order_status_id = ?
+        WHERE A.user_id = ? AND A.order_status_id = ?`, 
+        [orderStatusEnum.order, orderStatusEnum.order, userId, orderStatusEnum.cart]
+    ) 
 };
 
 const getProductDetail = async (userId) => {
@@ -21,7 +16,7 @@ const getProductDetail = async (userId) => {
             products_option_id,
             quantity 
         from orders
-        INNER JOIN order_items ON order_items.order_id = order_id
+        INNER JOIN order_items ON order_items.order_id = orders.id
         WHERE orders.user_id = ? AND orders.order_status_id = ?`, [userId, orderStatusEnum.cart]
     )
 }
@@ -36,43 +31,28 @@ const getPoint = async (userId) => {
 }
 
 const updateOrderPoint = (userId, totalPrice) => {
-    try {
-        return database.query(`
-            UPDATE users 
-            SET point = point - ?
-            WHERE users.id = ?`, [totalPrice, userId]
-        ) 
-    }
-    catch (err) {    
-        throw new Error('INVALID_DATA_INPUT')
-    }
+    return database.query(`
+        UPDATE users 
+        SET point = point - ?
+        WHERE users.id = ?`, [totalPrice, userId]
+    ) 
 };
 
 const updateOrderRecommend = (userOptionId) => {
-    try {
-        return database.query(`
-            INSERT INTO recommend(
-                user_id, 
-                products_option_id 
-            ) VALUES ?`, [userOptionId]
-        ) 
-    }
-    catch (err) {    
-        throw new Error('INVALID_DATA_INPUT')
-    }
+    return database.query(`
+        INSERT INTO recommend(
+            user_id, 
+            products_option_id 
+        ) VALUES ?`, [userOptionId]
+    ) 
 };
 
 const updateOrderQuantity = (quantityid) => {
-    try {
-        return database.query(`
-            UPDATE products_option 
-            SET stock = stock - ?
-            WHERE id = ?`, [quantityid[0], quantityid[1]]
-        ) 
-    }
-    catch (err) {    
-        throw new Error('INVALID_DATA_INPUT')
-    }
+    return database.query(`
+        UPDATE products_option 
+        SET stock = stock - ?
+        WHERE id = ?`, [quantityid[0], quantityid[1]]
+    ) 
 };
 
 const getUserPoint = async (userId) => {
