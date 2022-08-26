@@ -18,10 +18,10 @@ const updateOrderStatus = (userId) => {
 const getProductDetail = async (userId) => {
     return database.query(`
         SELECT 
-            products_option_id,
-            quantity 
+            order_items.products_option_id,
+            order_items.quantity
         from orders
-        INNER JOIN order_items ON order_items.order_id = order_id
+        INNER JOIN order_items ON order_items.order_id = orders.id
         WHERE orders.user_id = ? AND orders.order_status_id = ?`, [userId, orderStatusEnum.cart]
     )
 }
