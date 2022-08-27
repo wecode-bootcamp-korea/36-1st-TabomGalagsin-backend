@@ -1,4 +1,11 @@
-# 따봉 가락신 :파라솔이_있는_해변:
+# 따봉 가락신 🏖
+## 시연영상 LINK
+[![Video Label](http://img.youtube.com/vi/kaVLMD1Mfi4/0.jpg)](https://youtu.be/kaVLMD1Mfi4)
+
+👉화면을 클릭하면 영상으로 이동합니다.
+
+<br/>
+
 ![따봉 가락신](https://user-images.githubusercontent.com/105341553/186824307-3933622b-ec51-4228-a71c-33245c54e5b0.png)
 클론 사이트 : 하바이아나스 https://havaianas.com.br/
 
