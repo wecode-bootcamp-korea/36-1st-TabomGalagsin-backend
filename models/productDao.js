@@ -1,7 +1,7 @@
-const { database } = require('./database');
+const { database } = require("./database");
 
 const lookUpNew = () => {
-    return database.query(`
+  return database.query(`
     SELECT  
         p.id AS productId,
         p.name,
@@ -37,12 +37,11 @@ const lookUpNew = () => {
     INNER JOIN products_option ON p.id = products_option.product_id
     WHERE p.is_new = true AND products_option.stock > 0
     GROUP BY p.id
-    ORDER BY RAND() LIMIT 4`
-    )
+    ORDER BY RAND() LIMIT 4`);
 };
 
 const productColorUrl = (productId, colorId) => {
-    return database.query(`
+  return database.query(`
     SELECT
 	    pi.image_url thumbnailUrl,
 	    JSON_ARRAYAGG(JSON_OBJECT(
@@ -59,11 +58,12 @@ const productColorUrl = (productId, colorId) => {
     INNER JOIN product_image pi
     ON pi.product_id = p.id AND pi.color_id = c.id
     WHERE p.id = ${productId} AND c.id = ${colorId} 
-    GROUP BY p.id, pi.image_url;`)
+    GROUP BY p.id, pi.image_url;`);
 };
 
 const lookUpRecommend = async (colorId) => {
-    return database.query(`
+  return database.query(
+    `
     SELECT  
         p.id AS productId,
         p.name,
@@ -99,12 +99,13 @@ const lookUpRecommend = async (colorId) => {
     INNER JOIN products_option ON p.id = products_option.product_id
     WHERE product_image.color_id = ? AND products_option.stock > 0
     GROUP BY p.id, product_image.image_url
-    ORDER BY RAND() LIMIT 4`, [colorId]   
-    )
-}
+    ORDER BY RAND() LIMIT 4`,
+    [colorId]
+  );
+};
 
 const randomLookUp = () => {
-    return database.query(`
+  return database.query(`
     SELECT  
         p.id AS productId,
         p.name,
@@ -141,12 +142,12 @@ const randomLookUp = () => {
     INNER JOIN products_option ON p.id = products_option.product_id
     WHERE products_option.stock > 0
     GROUP BY p.id, products_option.stock
-    ORDER BY RAND() LIMIT 4;`
-    )
-}
+    ORDER BY RAND() LIMIT 4;`);
+};
 
 const checkColorId = (userId) => {
-    return database.query(`
+  return database.query(
+    `
         SELECT products_option.color_id
         FROM users
         INNER JOIN recommend ON recommend.user_id = users.id
@@ -162,13 +163,14 @@ const checkColorId = (userId) => {
         INNER JOIN recommend ON recommend.user_id = users.id
         INNER JOIN products_option ON products_option.id = recommend.products_option_id
         WHERE users.id = ?
-        GROUP BY products_option.color_id) AS result)`, [userId, userId]
-    )
-}
+        GROUP BY products_option.color_id) AS result)`,
+    [userId, userId]
+  );
+};
 
 const getProductInfoByproductId = async (productId) => {
-    try {
-        return await database.query(`
+  return await database.query(
+    `
         SELECT 
             p.id productId,
             p.name,
@@ -228,20 +230,16 @@ const getProductInfoByproductId = async (productId) => {
         ON p.type_id = t.id
         WHERE p.id = ?
         GROUP by p.id
-        ORDER BY p.id;`
-        , [productId]);
-    } catch (err) {
-        const error = new Error('INVALID_DATA_INPUT');
-        error.statusCode = 500;
-        throw error;
-    }
-}
+        ORDER BY p.id;`,
+    [productId]
+  );
+};
 
 module.exports = {
-    productColorUrl,
-    lookUpNew,
-    lookUpRecommend,
-    randomLookUp,
-    checkColorId,
-    getProductInfoByproductId
-}
+  productColorUrl,
+  lookUpNew,
+  lookUpRecommend,
+  randomLookUp,
+  checkColorId,
+  getProductInfoByproductId,
+};
